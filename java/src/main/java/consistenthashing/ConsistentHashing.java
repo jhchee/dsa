@@ -3,6 +3,7 @@ package consistenthashing;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -46,9 +47,8 @@ public class ConsistentHashing {
         }
         long hash = generateHash(key);
 
-        // get the server by hash
+        // Find the next closest server.
         if (!ring.containsKey(hash)) {
-            // The crux
             // It can head or tail biased, in this case, we are going for tail biased.
             SortedMap<Long, String> tailMap = ring.tailMap(hash);
             hash = tailMap.isEmpty() ? ring.firstKey() : tailMap.firstKey();
@@ -57,7 +57,8 @@ public class ConsistentHashing {
     }
 
     public Collection<String> listServers() {
-        return ring.values();
+        // Remove virtual nodes
+        return new HashSet<>(ring.values());
     }
 
     public static void main(String[] args) throws NoSuchAlgorithmException {
